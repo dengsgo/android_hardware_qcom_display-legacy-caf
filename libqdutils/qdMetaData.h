@@ -36,6 +36,7 @@ enum {
     PP_PARAM_INTENSITY,
     PP_PARAM_CONTRAST,
     PP_PARAM_SHARPNESS,
+    PP_PARAM_INTERLACED,
 };
 
 int setMetaData(private_handle_t *handle, int paramType, float paramValue);

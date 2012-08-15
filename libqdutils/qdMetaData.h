@@ -30,16 +30,14 @@
 #ifndef _QDMETADATA_H
 #define _QDMETADATA_H
 
-enum {
-    PP_PARAM_HUE = 1,
-    PP_PARAM_SATURATION,
-    PP_PARAM_INTENSITY,
-    PP_PARAM_CONTRAST,
-    PP_PARAM_SHARPNESS,
-    PP_PARAM_INTERLACED,
-};
+typedef enum {
+    PP_PARAM_HSIC       = 0x0001,
+    PP_PARAM_SHARPNESS  = 0x0002,
+    PP_PARAM_INTERLACED = 0x0004,
+    PP_PARAM_VID_INTFC  = 0x0008
+} DispParamType;
 
-int setMetaData(private_handle_t *handle, int paramType, float paramValue);
+int setMetaData(private_handle_t *handle, DispParamType paramType, void *param);
 
 #endif /* _QDMETADATA_H */
 

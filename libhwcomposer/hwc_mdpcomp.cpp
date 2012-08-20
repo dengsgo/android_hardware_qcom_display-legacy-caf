@@ -295,7 +295,13 @@ int MDPComp::prepare(hwc_context_t *ctx, hwc_layer_t *layer,
         ovutils::eMdpFlags mdpFlags = mdp_info.isVG ? ovutils::OV_MDP_PIPE_SHARE
                                                    : ovutils::OV_MDP_FLAGS_NONE;
         ovutils::eIsFg isFG = mdp_info.isFG ? ovutils::IS_FG_SET
-                                                           : ovutils::IS_FG_OFF;
+                                                    : ovutils::IS_FG_OFF;
+
+        if(layer->blending == HWC_BLENDING_PREMULT) {
+            ovutils::setMdpFlags(mdpFlags,
+                    ovutils::OV_MDP_BLEND_FG_PREMULT);
+        }
+
         ovutils::PipeArgs parg(mdpFlags,
                                info,
                                zOrder,

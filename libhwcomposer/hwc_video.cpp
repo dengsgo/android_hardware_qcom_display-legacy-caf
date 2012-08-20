@@ -116,10 +116,15 @@ bool configPrimVid(hwc_context_t *ctx, hwc_layer_t *layer) {
         ovutils::setMdpFlags(mdpFlags,
                 ovutils::OV_MDP_SECURE_OVERLAY_SESSION);
     }
+    if(layer->blending == HWC_BLENDING_PREMULT) {
+        ovutils::setMdpFlags(mdpFlags,
+                ovutils::OV_MDP_BLEND_FG_PREMULT);
+    }
     MetaData_t *metadata = (MetaData_t *)hnd->base_metadata;
     if (metadata->paramType == PP_PARAM_INTERLACED && metadata->paramValue) {
         ovutils::setMdpFlags(mdpFlags, ovutils::OV_MDP_DEINTERLACE);
     }
+
     ovutils::eIsFg isFgFlag = ovutils::IS_FG_OFF;
     if (ctx->numHwLayers == 1) {
         isFgFlag = ovutils::IS_FG_SET;

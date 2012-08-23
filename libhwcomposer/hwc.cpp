@@ -103,6 +103,7 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list)
         } else { // Else set this flag to false, otherwise video cases
                  // fail in non-overlay targets.
             ctx->overlayInUse = false;
+            ctx->mOverlay->setState(ovutils::OV_CLOSED);
         }
     }
 
@@ -183,8 +184,6 @@ static int hwc_set(hwc_composer_device_t *dev,
         ctx->qbuf->unlockAll();
     }
 
-    if(!ctx->overlayInUse)
-        ctx->mOverlay->setState(ovutils::OV_CLOSED);
 
     ctx->qbuf->unlockAllPrevious();
     return ret;

@@ -50,6 +50,7 @@ public:
                                      hwc_layer_list_t *list);
     static bool validateParams (hwc_context_t *ctx,
                                 const hwc_layer_list_t *list);
+    static bool canUseContiguousMemory(const hwc_layer_list_t* list);
     static void closeEglLib();
     static void openEglLibAndGethandle();
 private:

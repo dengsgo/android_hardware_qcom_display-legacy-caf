@@ -137,8 +137,18 @@ enum {
 /*****************************************************************************/
 
 typedef struct {
-    int32_t paramType;
-    float   paramValue;
+    int32_t hue;
+    float   saturation;
+    int32_t intensity;
+    float   contrast;
+} HSICData_t;
+
+typedef struct {
+    int32_t operation;
+    int32_t interlaced;
+    HSICData_t hsicData;
+    int32_t sharpness;
+    int32_t video_interface;
 } MetaData_t;
 
 #ifdef __cplusplus

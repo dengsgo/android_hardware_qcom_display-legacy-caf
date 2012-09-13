@@ -33,7 +33,8 @@
 #include <gralloc_priv.h>
 #include "qdMetaData.h"
 
-int setMetaData(private_handle_t *handle, int paramType, float paramValue) {
+int setMetaData(private_handle_t *handle, DispParamType paramType,
+                                                    void *param) {
     if (!handle) {
         ALOGE("%s: Private handle is null!", __func__);
         return -1;
@@ -50,9 +51,26 @@ int setMetaData(private_handle_t *handle, int paramType, float paramValue) {
         return -1;
     }
     MetaData_t *data = reinterpret_cast <MetaData_t *>(base);
-    data->paramType = paramType;
-    data->paramValue = paramValue;
+    data->operation |= paramType;
+    switch (paramType) {
+        case PP_PARAM_HSIC:
+            memcpy((void *)&data->hsicData, param, sizeof(HSICData_t));
+            break;
+        case PP_PARAM_SHARPNESS:
+            data->sharpness = *((int32_t *)param);
+            break;
+        case PP_PARAM_VID_INTFC:
+            data->video_interface = *((int32_t *)param);
+            break;
+        case PP_PARAM_INTERLACED:
+            data->interlaced = *((int32_t *)param);
+            break;
+        default:
+            ALOGE("Unknown paramType %d", paramType);
+            break;
+    }
     if(munmap(base, size))
-        ALOGE("%s: failed to unmap ptr 0x%x, err %d", __func__, (int)base, errno);
+        ALOGE("%s: failed to unmap ptr 0x%x, err %d", __func__, (int)base,
+                                                                        errno);
     return 0;
 }

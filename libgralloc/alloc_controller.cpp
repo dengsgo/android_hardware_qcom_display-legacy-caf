@@ -43,15 +43,11 @@ using namespace qdutils;
 static bool canFallback(int usage, bool triedSystem)
 {
     // Fallback to system heap when alloc fails unless
-    // 1. Composition type is MDP
-    // 2. Alloc from system heap was already tried
-    // 3. The heap type is requsted explicitly
-    // 4. The heap type is protected
-    // 5. The buffer is meant for external display only
+    // 1. Alloc from system heap was already tried
+    // 2. The heap type is requsted explicitly
+    // 3. The heap type is protected
+    // 4. The buffer is meant for external display only
 
-    if(QCCompositionType::getInstance().getCompositionType() &
-       COMPOSITION_TYPE_MDP)
-        return false;
     if(triedSystem)
         return false;
     if(usage & (GRALLOC_HEAP_MASK | GRALLOC_USAGE_PROTECTED |

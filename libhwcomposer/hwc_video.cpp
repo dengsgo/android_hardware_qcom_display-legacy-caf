@@ -24,8 +24,6 @@
 
 namespace qhwc {
 
-#define FINAL_TRANSFORM_MASK 0x000F
-
 //Static Members
 ovutils::eOverlayState VideoOverlay::sState = ovutils::OV_CLOSED;
 int VideoOverlay::sYuvCount = 0;
@@ -178,9 +176,8 @@ bool configPrimVid(hwc_context_t *ctx, hwc_layer_t *layer) {
     //Only for Primary
     ov.setCrop(dcrop, ovutils::OV_PIPE0);
 
-    int transform = layer->transform & FINAL_TRANSFORM_MASK;
     ovutils::eTransform orient =
-            static_cast<ovutils::eTransform>(transform);
+            static_cast<ovutils::eTransform>(layer->transform);
     ov.setTransform(orient, ovutils::OV_PIPE0);
 
     ov.setPosition(dpos, ovutils::OV_PIPE0);
@@ -227,9 +224,8 @@ bool configExtVid(hwc_context_t *ctx, hwc_layer_t *layer) {
     //Only for External
     ov.setCrop(dcrop, ovutils::OV_PIPE1);
 
-    // FIXME: Use source orientation for TV when source is portrait
-    //Only for External
-    ov.setTransform(0, ovutils::OV_PIPE1);
+    //use sourceTransform only for External
+    ov.setTransform(layer->sourceTransform, ovutils::OV_PIPE1);
 
     ovutils::Dim dpos;
     hwc_rect_t displayFrame = layer->displayFrame;

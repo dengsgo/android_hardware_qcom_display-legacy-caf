@@ -129,6 +129,12 @@ inline void getLayerResolution(const hwc_layer_t* layer,
 }
 }; //qhwc namespace
 
+struct vsync_state {
+    pthread_mutex_t lock;
+    pthread_cond_t  cond;
+    bool enable;
+};
+
 // -----------------------------------------------------------------------------
 // HWC context
 // This structure contains overall state
@@ -159,6 +165,9 @@ struct hwc_context_t {
     qhwc::ExternalDisplay *mExtDisplay;
 
     qhwc::MDPInfo mMDP;
+
+    //Vsync
+    struct vsync_state vstate;
 
 };
 

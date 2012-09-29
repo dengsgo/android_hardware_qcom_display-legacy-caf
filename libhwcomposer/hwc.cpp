@@ -71,6 +71,11 @@ static void hwc_registerProcs(struct hwc_composer_device* dev,
         return;
     }
     ctx->device.reserved_proc[0] = (void*)procs;
+
+    // Now that we have the functions needed, kick off
+    // the uevent & vsync threads
+    init_uevent_thread(ctx);
+    init_vsync_thread(ctx);
 }
 
 static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list)
@@ -228,7 +233,7 @@ static int hwc_device_open(const struct hw_module_t* module, const char* name,
         dev->device.common.tag     = HARDWARE_DEVICE_TAG;
         //XXX: This disables hardware vsync on 8x55
         // Fix when HW vsync is available on 8x55
-        if(dev->mMDP.version == 400)
+        if(dev->mMDP.version == 400 || (dev->mMDP.version >= 500))
             dev->device.common.version = 0;
         else
             dev->device.common.version = HWC_DEVICE_API_VERSION_0_3;

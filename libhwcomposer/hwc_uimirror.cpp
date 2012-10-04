@@ -69,15 +69,18 @@ bool UIMirrorOverlay::configure(hwc_context_t *ctx, hwc_layer_list_t *list)
             ovutils::Whf info(alignedW, hnd->height, hnd->format, size);
             // Determine the RGB pipe for UI depending on the state
             ovutils::eDest dest = ovutils::OV_PIPE_ALL;
+            ovutils::eMdpFlags mdpFlags = ovutils::OV_MDP_FLAGS_NONE;
+
             if (sState == ovutils::OV_2D_TRUE_UI_MIRROR) {
                 // True UI mirroring state: external RGB pipe is OV_PIPE2
                 dest = ovutils::OV_PIPE2;
             } else if (sState == ovutils::OV_UI_MIRROR) {
                 // UI-only mirroring state: external RGB pipe is OV_PIPE0
                 dest = ovutils::OV_PIPE0;
+                ovutils::setMdpFlags(mdpFlags,
+                                     ovutils::OV_MDP_PIPE_SHARE);
             }
 
-            ovutils::eMdpFlags mdpFlags = ovutils::OV_MDP_FLAGS_NONE;
             /* - TODO: Secure content
                if (hnd->flags & private_handle_t::PRIV_FLAGS_SECURE_BUFFER) {
                ovutils::setMdpFlags(mdpFlags,

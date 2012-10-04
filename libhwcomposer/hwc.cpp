@@ -88,8 +88,10 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list)
         ovutils::setExtType(ctx->mExtDisplay->getExternalDisplay());
     if (ctx->hdmi_pending == true) {
         if ((qdutils::MDPVersion::getInstance().getMDPVersion() >=
-            qdutils::MDP_V4_2) || (ctx->mOverlay->getState() !=
-                                  ovutils::OV_BYPASS_3_LAYER)) {
+            qdutils::MDP_V4_2) ||((ctx->mOverlay->getState() !=
+            ovutils::OV_BYPASS_3_LAYER) && (ctx->mOverlay->getState() !=
+            ovutils::OV_BYPASS_2_LAYER) && (ctx->mOverlay->getState() !=
+                                ovutils::OV_BYPASS_1_LAYER))) {
             ctx->mExtDisplay->processUEventOnline((const char*)ctx->mHDMIEvent);
             ctx->hdmi_pending = false;
         }

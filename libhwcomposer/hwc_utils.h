@@ -169,6 +169,8 @@ struct hwc_context_t {
     //Vsync
     struct vsync_state vstate;
 
+    bool hdmi_pending;
+    char  mHDMIEvent[512];
 };
 
 #endif //HWC_UTILS_H

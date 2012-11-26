@@ -128,7 +128,7 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list)
 }
 
 static int hwc_eventControl(struct hwc_composer_device* dev,
-                             int event, int value)
+                             int event, int enabled)
 {
     int ret = 0;
     static int prev_value, temp;
@@ -139,31 +139,31 @@ static int hwc_eventControl(struct hwc_composer_device* dev,
     switch(event) {
 #ifndef NO_HW_VSYNC
         case HWC_EVENT_VSYNC:
-            if (value == prev_value){
+            if (enabled == prev_value){
                 //TODO see why HWC gets repeated events
                 ALOGD_IF(VSYNC_DEBUG, "%s - VSYNC is already %s",
-                        __FUNCTION__, (value)?"ENABLED":"DISABLED");
+                        __FUNCTION__, (enabled)?"ENABLED":"DISABLED");
             }
             temp = ctx->vstate.enable;
-            if(ioctl(m->framebuffer->fd, MSMFB_OVERLAY_VSYNC_CTRL, &value) < 0)
+            if(ioctl(m->framebuffer->fd, MSMFB_OVERLAY_VSYNC_CTRL, &enabled) < 0)
                 ret = -errno;
 
             /* vsync state change logic */
-            if (value == 1) {
+            if (enabled == 1) {
                 //unblock vsync thread
                 pthread_mutex_lock(&ctx->vstate.lock);
                 ctx->vstate.enable = true;
                 pthread_cond_signal(&ctx->vstate.cond);
                 pthread_mutex_unlock(&ctx->vstate.lock);
             }
-            if (value == 0 && temp) {
+            if (enabled == 0 && temp) {
                 //vsync thread will block
                 pthread_mutex_lock(&ctx->vstate.lock);
                 ctx->vstate.enable = false;
                 pthread_mutex_unlock(&ctx->vstate.lock);
             }
             ALOGD_IF (VSYNC_DEBUG, "VSYNC state changed from %s to %s",
-              (prev_value)?"ENABLED":"DISABLED", (value)?"ENABLED":"DISABLED");
+              (prev_value)?"ENABLED":"DISABLED", (enabled)?"ENABLED":"DISABLED");
             prev_value = value;
             /* vsync state change logic - end*/
 

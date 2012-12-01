@@ -63,7 +63,7 @@ static void *vsync_loop(void *param)
           pthread_cond_wait(&ctx->vstate.cond, &ctx->vstate.lock);
         }
         pthread_mutex_unlock(&ctx->vstate.lock);
-
+#ifndef NO_HW_VSYNC
        int hdmiconnected = ctx->mExtDisplay->getExternalDisplay();
 
        // vsync for primary OR HDMI ?
@@ -114,9 +114,15 @@ static void *vsync_loop(void *param)
 
       // reset fd
       fd_timestamp = -1;
-
+#else
+    // I think the kernel just reports the time vsync finished so
+    // just send sf the current time
+    proc->vsync(proc, 0, systemTime(CLOCK_MONOTONIC));
+#endif
       // repeat, whatever, you just did
     } while (true);
+
+    return NULL;
 }
 
 void init_vsync_thread(hwc_context_t* ctx)

@@ -137,7 +137,6 @@ static int hwc_eventControl(struct hwc_composer_device* dev,
     private_module_t* m = reinterpret_cast<private_module_t*>(
                 ctx->mFbDev->common.module);
     switch(event) {
-#ifndef NO_HW_VSYNC
         case HWC_EVENT_VSYNC:
             if (enabled == prev_value){
                 //TODO see why HWC gets repeated events
@@ -145,9 +144,10 @@ static int hwc_eventControl(struct hwc_composer_device* dev,
                         __FUNCTION__, (enabled)?"ENABLED":"DISABLED");
             }
             temp = ctx->vstate.enable;
+#ifndef NO_HW_VSYNC
             if(ioctl(m->framebuffer->fd, MSMFB_OVERLAY_VSYNC_CTRL, &enabled) < 0)
                 ret = -errno;
-
+#endif
             /* vsync state change logic */
             if (enabled == 1) {
                 //unblock vsync thread
@@ -164,15 +164,14 @@ static int hwc_eventControl(struct hwc_composer_device* dev,
             }
             ALOGD_IF (VSYNC_DEBUG, "VSYNC state changed from %s to %s",
               (prev_value)?"ENABLED":"DISABLED", (enabled)?"ENABLED":"DISABLED");
-            prev_value = value;
+            prev_value = enabled;
             /* vsync state change logic - end*/
 
              if(ctx->mExtDisplay->isHDMIConfigured() &&
                 (ctx->mExtDisplay->getExternalDisplay()==EXTERN_DISPLAY_FB1)) {
-                ret = ctx->mExtDisplay->enableHDMIVsync(value);
+                ret = ctx->mExtDisplay->enableHDMIVsync(enabled);
              }
            break;
-#endif
 #ifdef QCOM_BSP
        case HWC_EVENT_ORIENTATION:
              ctx->deviceOrientation = value;
@@ -273,12 +272,9 @@ static int hwc_device_open(const struct hw_module_t* module, const char* name,
 
         dev->device.common.tag     = HARDWARE_DEVICE_TAG;
 #ifdef NO_HW_VSYNC
-        dev->device.common.version = 0;
-        ALOGI("%s: Hardware VSYNC not supported", __FUNCTION__);
-#else
-        dev->device.common.version = HWC_DEVICE_API_VERSION_0_3;
-        ALOGI("%s: Hardware VSYNC supported", __FUNCTION__);
+        ALOGI("%s: Faking Hardware VSYNC", __FUNCTION__);
 #endif
+        dev->device.common.version = HWC_DEVICE_API_VERSION_0_3;
         dev->device.common.module  = const_cast<hw_module_t*>(module);
         dev->device.common.close   = hwc_device_close;
         dev->device.prepare        = hwc_prepare;

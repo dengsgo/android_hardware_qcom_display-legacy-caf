@@ -28,7 +28,7 @@
 #define QCOM_UTIL_H
 
 #include <gralloc_priv.h>
-#include <comptype.h>
+//#include <comptype.h>
 #include <ui/Region.h>
 #include <hardware/hwcomposer.h>
 #include "egl_handles.h"

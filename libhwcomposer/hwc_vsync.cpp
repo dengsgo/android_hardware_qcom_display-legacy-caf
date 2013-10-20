@@ -29,7 +29,9 @@
 #include "hwc_external.h"
 #include "string.h"
 
+#ifndef PAGE_SIZE
 #define PAGE_SIZE 4096
+#endif
 
 namespace qhwc {
 

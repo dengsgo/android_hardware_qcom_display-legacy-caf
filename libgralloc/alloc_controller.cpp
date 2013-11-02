@@ -177,8 +177,6 @@ size_t getBufferSizeAndDimensions(int width, int height, int format,
             size = alignedw * alignedh * 3;
             break;
         case HAL_PIXEL_FORMAT_RGB_565:
-        case HAL_PIXEL_FORMAT_RGBA_5551:
-        case HAL_PIXEL_FORMAT_RGBA_4444:
             size = alignedw * alignedh * 2;
             break;
 

@@ -5,9 +5,11 @@ LOCAL_MODULE                  := liboverlay
 LOCAL_MODULE_PATH             := $(TARGET_OUT_SHARED_LIBRARIES)
 LOCAL_MODULE_TAGS             := optional
 LOCAL_C_INCLUDES              := $(common_includes) $(kernel_includes)
+LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
 LOCAL_SHARED_LIBRARIES        := $(common_libs) libmemalloc
 LOCAL_CFLAGS                  := $(common_flags) -DLOG_TAG=\"overlay\"
 LOCAL_ADDITIONAL_DEPENDENCIES := $(common_deps)
+LOCAL_ADDITIONAL_DEPENDENCIES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 LOCAL_SRC_FILES := \
       overlay.cpp \
       overlayCtrl.cpp \

@@ -5,6 +5,8 @@ common_includes += hardware/qcom/display-legacy-caf/liboverlay
 common_includes += hardware/qcom/display-legacy-caf/libcopybit
 common_includes += hardware/qcom/display-legacy-caf/libqdutils
 
+common_header_export_path := qcom/display
+
 ifeq ($(TARGET_USES_POST_PROCESSING),true)
     common_flags     += -DUSES_POST_PROCESSING
     common_includes += $(TARGET_OUT_HEADERS)/pp/inc

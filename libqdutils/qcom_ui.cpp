@@ -674,8 +674,6 @@ void dumpLayer(int moduleCompositionType, int listFlags, size_t layerIndex,
                 tempSkBmpConfig = SkBitmap::kARGB_8888_Config;
                 break;
             case HAL_PIXEL_FORMAT_RGB_565:
-            case HAL_PIXEL_FORMAT_RGBA_5551:
-            case HAL_PIXEL_FORMAT_RGBA_4444:
                 tempSkBmpConfig = SkBitmap::kRGB_565_Config;
                 break;
             case HAL_PIXEL_FORMAT_RGB_888:

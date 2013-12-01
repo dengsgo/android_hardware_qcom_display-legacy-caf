@@ -118,6 +118,9 @@ typedef enum {
     C2D_COLOR_FORMAT_4444_ARGB    = 14,  /* 16-bit colors (4-bit alpha) */
     C2D_COLOR_FORMAT_8565_ARGB    = 15,  /* 24-bit colors (8-bit alpha) */
     C2D_COLOR_FORMAT_8888_ARGB    = 16,  /* 32-bit colors (8-bit alpha) */
+
+    C2D_COLOR_FORMAT_5551_RGBA    = 17,  /* 16-bit colors (1-bit alpha) */
+    C2D_COLOR_FORMAT_4444_RGBA    = 18,  /* 16-bit colors (4-bit alpha) */
     C2D_COLOR_FORMAT_5658_RGBA    = 19,  /* 24-bit colors (8-bit alpha) */
     C2D_COLOR_FORMAT_8888_RGBA    = 20,  /* 32-bit colors (8-bit alpha) */
 

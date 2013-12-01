@@ -223,9 +223,11 @@ int c2diGetBpp(int32 colorformat)
 
     switch(colorformat&0xFF)
     {
+        case C2D_COLOR_FORMAT_4444_RGBA:
         case C2D_COLOR_FORMAT_4444_ARGB:
         case C2D_COLOR_FORMAT_1555_ARGB:
         case C2D_COLOR_FORMAT_565_RGB:
+        case C2D_COLOR_FORMAT_5551_RGBA:
             c2dBpp = 16;
             break;
         case C2D_COLOR_FORMAT_8888_RGBA:
@@ -833,6 +835,7 @@ static int is_alpha(int cformat)
     switch (cformat & 0xFF) {
         case C2D_COLOR_FORMAT_8888_ARGB:
         case C2D_COLOR_FORMAT_8888_RGBA:
+        case C2D_COLOR_FORMAT_5551_RGBA:
         case C2D_COLOR_FORMAT_4444_ARGB:
             alpha = 1;
             break;

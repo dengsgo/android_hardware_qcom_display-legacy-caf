@@ -42,6 +42,9 @@
 #define USE_GENLOCK
 #endif
 
+// genlock failed on Broswer, disable it before any better solution found
+#undef USE_GENLOCK
+
 namespace {
 /* Internal function to map the userspace locks to the kernel lock types */
     int get_kernel_lock_type(genlock_lock_type lockType)

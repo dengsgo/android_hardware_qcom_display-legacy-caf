@@ -43,6 +43,15 @@
 #include <cutils/properties.h>
 #include <profiler.h>
 
+#ifndef NO_HW_VSYNC
+#ifndef MSMFB_IOCTL_MAGIC
+#define MSMFB_IOCTL_MAGIC 'm'
+#endif
+#ifndef MSMFB_OVERLAY_VSYNC_CTRL
+#define MSMFB_OVERLAY_VSYNC_CTRL _IOW(MSMFB_IOCTL_MAGIC, 160, unsigned int)
+#endif
+#endif
+
 #define EVEN_OUT(x) if (x & 0x0001) {x--;}
 /** min of int a, b */
 static inline int min(int a, int b) {
@@ -100,6 +109,9 @@ static int fb_setUpdateRect(struct framebuffer_device_t* dev,
 
 static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
 {
+#ifndef NO_HW_VSYNC
+    int e = 1;
+#endif
     if (private_handle_t::validate(buffer) < 0)
         return -EINVAL;
 
@@ -131,7 +143,13 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
             genlock_unlock_buffer(hnd);
             return -errno;
         }
+#ifndef NO_HW_VSYNC
+        if(ioctl(m->framebuffer->fd, MSMFB_OVERLAY_VSYNC_CTRL, &e) == -1) {
+        ALOGE("MSMFB_OVERLAY_VSYNC_CTRL failed");
+        return -errno;
+        }
 
+#endif
         //Signals the composition thread to unblock and loop over if necessary
         pthread_mutex_lock(&m->fbPanLock);
         m->fbPanDone = true;
@@ -187,7 +205,13 @@ int mapFrameBufferLocked(struct private_module_t* module)
     struct fb_var_screeninfo info;
     if (ioctl(fd, FBIOGET_VSCREENINFO, &info) == -1)
         return -errno;
-
+#ifndef NO_HW_VSYNC
+    int e = 1;
+    if (ioctl(fd, MSMFB_OVERLAY_VSYNC_CTRL, &e) == -1) {
+        ALOGE("MSMFB_OVERLAY_VSYNC_CTRL failed");
+        return -errno;
+    }
+#endif
     info.reserved[0] = 0;
     info.reserved[1] = 0;
     info.reserved[2] = 0;
@@ -297,7 +321,11 @@ int mapFrameBufferLocked(struct private_module_t* module)
     float xdpi = (info.xres * 25.4f) / info.width;
     float ydpi = (info.yres * 25.4f) / info.height;
     //The reserved[3] field is used to store FPS by the driver.
+#ifndef REFRESH_RATE
     float fps  = info.reserved[3] & 0xFF;
+#else
+    float fps  = REFRESH_RATE;
+#endif
 
     ALOGI("using (fd=%d)\n"
           "id           = %s\n"

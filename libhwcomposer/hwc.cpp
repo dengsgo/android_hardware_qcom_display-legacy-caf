@@ -171,9 +171,11 @@ static int hwc_eventControl(struct hwc_composer_device* dev,
                 ret = ctx->mExtDisplay->enableHDMIVsync(value);
              }
            break;
+#ifdef QCOM_BSP
        case HWC_EVENT_ORIENTATION:
              ctx->deviceOrientation = value;
            break;
+#endif
         default:
             ret = -EINVAL;
     }

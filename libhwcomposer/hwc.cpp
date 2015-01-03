@@ -137,6 +137,7 @@ static int hwc_eventControl(struct hwc_composer_device* dev,
     private_module_t* m = reinterpret_cast<private_module_t*>(
                 ctx->mFbDev->common.module);
     switch(event) {
+#ifndef NO_HW_VSYNC
         case HWC_EVENT_VSYNC:
             if (value == prev_value){
                 //TODO see why HWC gets repeated events
@@ -171,6 +172,7 @@ static int hwc_eventControl(struct hwc_composer_device* dev,
                 ret = ctx->mExtDisplay->enableHDMIVsync(value);
              }
            break;
+#endif
 #ifdef QCOM_BSP
        case HWC_EVENT_ORIENTATION:
              ctx->deviceOrientation = value;
@@ -270,12 +272,13 @@ static int hwc_device_open(const struct hw_module_t* module, const char* name,
         methods->eventControl = hwc_eventControl;
 
         dev->device.common.tag     = HARDWARE_DEVICE_TAG;
-        //XXX: This disables hardware vsync on 8x55
-        // Fix when HW vsync is available on 8x55
-        if(dev->mMDP.version == 400 || (dev->mMDP.version >= 500))
-            dev->device.common.version = 0;
-        else
-            dev->device.common.version = HWC_DEVICE_API_VERSION_0_3;
+#ifdef NO_HW_VSYNC
+        dev->device.common.version = 0;
+        ALOGI("%s: Hardware VSYNC not supported", __FUNCTION__);
+#else
+        dev->device.common.version = HWC_DEVICE_API_VERSION_0_3;
+        ALOGI("%s: Hardware VSYNC supported", __FUNCTION__);
+#endif
         dev->device.common.module  = const_cast<hw_module_t*>(module);
         dev->device.common.close   = hwc_device_close;
         dev->device.prepare        = hwc_prepare;

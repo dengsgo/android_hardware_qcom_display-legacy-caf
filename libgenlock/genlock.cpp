@@ -44,8 +44,6 @@
 
 // genlock failed on Broswer, disable it before any better solution found
 #undef USE_GENLOCK
-// but a valid genlock handle is required for gsl
-#define FORCE_GENLOCK_HANDLE
 
 namespace {
 /* Internal function to map the userspace locks to the kernel lock types */
@@ -147,7 +145,7 @@ genlock_status_t genlock_create_lock(native_handle_t *buffer_handle)
     }
 
     private_handle_t *hnd = reinterpret_cast<private_handle_t*>(buffer_handle);
-#if defined(USE_GENLOCK) || defined(FORCE_GENLOCK_HANDLE)
+#ifdef USE_GENLOCK
     if ((hnd->flags & private_handle_t::PRIV_FLAGS_UNSYNCHRONIZED) == 0) {
         // Open the genlock device
         int fd = open(GENLOCK_DEVICE, O_RDWR);
@@ -198,7 +196,7 @@ genlock_status_t genlock_create_lock(native_handle_t *buffer_handle)
 genlock_status_t genlock_release_lock(native_handle_t *buffer_handle)
 {
     genlock_status_t ret = GENLOCK_NO_ERROR;
-#if defined(USE_GENLOCK) || defined(FORCE_GENLOCK_HANDLE)
+#ifdef USE_GENLOCK
     if (private_handle_t::validate(buffer_handle)) {
         ALOGE("%s: handle is invalid", __FUNCTION__);
         return GENLOCK_FAILURE;
@@ -228,7 +226,7 @@ genlock_status_t genlock_release_lock(native_handle_t *buffer_handle)
 genlock_status_t genlock_attach_lock(native_handle_t *buffer_handle)
 {
     genlock_status_t ret = GENLOCK_NO_ERROR;
-#if defined(USE_GENLOCK) || defined(FORCE_GENLOCK_HANDLE)
+#ifdef USE_GENLOCK
     if (private_handle_t::validate(buffer_handle)) {
         ALOGE("%s: handle is invalid", __FUNCTION__);
         return GENLOCK_FAILURE;

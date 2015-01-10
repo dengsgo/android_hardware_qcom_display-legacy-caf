@@ -4,6 +4,7 @@ common_includes += hardware/qcom/display-legacy-caf/libgenlock
 common_includes += hardware/qcom/display-legacy-caf/liboverlay
 common_includes += hardware/qcom/display-legacy-caf/libcopybit
 common_includes += hardware/qcom/display-legacy-caf/libqdutils
+common_includes += hardware/qcom/display-legacy-caf/libhwcomposer
 
 common_header_export_path := qcom/display
 

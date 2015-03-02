@@ -548,12 +548,6 @@ inline void getHalPixelFormatStr(int format, char pixelformatstr[])
         case HAL_PIXEL_FORMAT_BGRA_8888:
             strcpy(pixelformatstr, "BGRA_8888");
             break;
-        case HAL_PIXEL_FORMAT_RGBA_5551:
-            strcpy(pixelformatstr, "RGBA_5551");
-            break;
-        case HAL_PIXEL_FORMAT_RGBA_4444:
-            strcpy(pixelformatstr, "RGBA_4444");
-            break;
         case HAL_PIXEL_FORMAT_YV12:
             strcpy(pixelformatstr, "YV12");
             break;
@@ -680,8 +674,6 @@ void dumpLayer(int moduleCompositionType, int listFlags, size_t layerIndex,
                 tempSkBmpConfig = SkBitmap::kARGB_8888_Config;
                 break;
             case HAL_PIXEL_FORMAT_RGB_565:
-            case HAL_PIXEL_FORMAT_RGBA_5551:
-            case HAL_PIXEL_FORMAT_RGBA_4444:
                 tempSkBmpConfig = SkBitmap::kRGB_565_Config;
                 break;
             case HAL_PIXEL_FORMAT_RGB_888:

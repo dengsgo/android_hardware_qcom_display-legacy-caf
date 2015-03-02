@@ -116,27 +116,25 @@ void MDPComp::timeout_handler(void *udata) {
         return;
     }
 
-    hwc_procs* proc = (hwc_procs*)ctx->device.reserved_proc[0];
-
-    if(!proc) {
+    if(!ctx->proc) {
         ALOGE("%s: HWC proc not registered", __FUNCTION__);
         return;
     }
     sIdleFallBack = true;
     /* Trigger SF to redraw the current frame */
-    proc->invalidate(proc);
+    ctx->proc->invalidate(ctx->proc);
 }
 
-void MDPComp::reset_comp_type(hwc_layer_list_t* list) {
+void MDPComp::reset_comp_type(hwc_display_contents_1_t* list) {
     for(uint32_t i = 0 ; i < list->numHwLayers; i++ ) {
-        hwc_layer_t* l = &list->hwLayers[i];
+        hwc_layer_1_t* l = &list->hwLayers[i];
 
         if(l->compositionType == HWC_OVERLAY)
             l->compositionType = HWC_FRAMEBUFFER;
     }
 }
 
-void MDPComp::reset( hwc_context_t *ctx, hwc_layer_list_t* list ) {
+void MDPComp::reset( hwc_context_t *ctx, hwc_display_contents_1_t* list ) {
     sCurrentFrame.count = 0;
     free(sCurrentFrame.pipe_layer);
     sCurrentFrame.pipe_layer = NULL;
@@ -156,13 +154,13 @@ void MDPComp::reset( hwc_context_t *ctx, hwc_layer_list_t* list ) {
     }
 }
 
-void MDPComp::setLayerIndex(hwc_layer_t* layer, const int pipe_index)
+void MDPComp::setLayerIndex(hwc_layer_1_t* layer, const int pipe_index)
 {
     layer->flags &= ~HWC_MDPCOMP_INDEX_MASK;
     layer->flags |= pipe_index << MDPCOMP_INDEX_OFFSET;
 }
 
-int MDPComp::getLayerIndex(hwc_layer_t* layer)
+int MDPComp::getLayerIndex(hwc_layer_1_t* layer)
 {
     int byp_index = -1;
 
@@ -173,7 +171,7 @@ int MDPComp::getLayerIndex(hwc_layer_t* layer)
     }
     return byp_index;
 }
-void MDPComp::print_info(hwc_layer_t* layer)
+void MDPComp::print_info(hwc_layer_1_t* layer)
 {
      hwc_rect_t sourceCrop = layer->sourceCrop;
      hwc_rect_t displayFrame = layer->displayFrame;
@@ -196,7 +194,7 @@ void MDPComp::print_info(hwc_layer_t* layer)
 /*
  * Configures pipe(s) for MDP composition
  */
-int MDPComp::prepare(hwc_context_t *ctx, hwc_layer_t *layer,
+int MDPComp::prepare(hwc_context_t *ctx, hwc_layer_1_t *layer,
                                             mdp_pipe_info& mdp_info) {
 
     int nPipeIndex = mdp_info.index;
@@ -350,7 +348,7 @@ int MDPComp::prepare(hwc_context_t *ctx, hwc_layer_t *layer,
  * 5. Overlay in use
  */
 
-bool MDPComp::is_doable(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
+bool MDPComp::is_doable(hwc_composer_device_1_t *dev, hwc_display_contents_1_t* list) {
     hwc_context_t* ctx = (hwc_context_t*)(dev);
 
     if(!ctx) {
@@ -388,13 +386,13 @@ bool MDPComp::is_doable(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
     return true;
 }
 
-void MDPComp::setMDPCompLayerFlags(hwc_layer_list_t* list) {
+void MDPComp::setMDPCompLayerFlags(hwc_display_contents_1_t* list) {
 
     for(int index = 0 ; index < sCurrentFrame.count; index++ )
     {
         int layer_index = sCurrentFrame.pipe_layer[index].layer_index;
         if(layer_index >= 0) {
-            hwc_layer_t* layer = &(list->hwLayers[layer_index]);
+            hwc_layer_1_t* layer = &(list->hwLayers[layer_index]);
 
             layer->flags |= HWC_MDPCOMP;
             layer->compositionType = HWC_OVERLAY;
@@ -403,7 +401,7 @@ void MDPComp::setMDPCompLayerFlags(hwc_layer_list_t* list) {
     }
 }
 
-void MDPComp::get_layer_info(hwc_layer_t* layer, int& flags) {
+void MDPComp::get_layer_info(hwc_layer_1_t* layer, int& flags) {
 
     private_handle_t* hnd = (private_handle_t*)layer->handle;
 
@@ -428,7 +426,7 @@ void MDPComp::get_layer_info(hwc_layer_t* layer, int& flags) {
     }
 }
 
-int MDPComp::mark_layers(hwc_layer_list_t* list, layer_mdp_info* layer_info,
+int MDPComp::mark_layers(hwc_display_contents_1_t* list, layer_mdp_info* layer_info,
                                                     frame_info& current_frame) {
 
     int layer_count = list->numHwLayers;
@@ -442,7 +440,7 @@ int MDPComp::mark_layers(hwc_layer_list_t* list, layer_mdp_info* layer_info,
 
     //Parse layers from higher z-order
     for(int index = layer_count - 1 ; index >= 0; index-- ) {
-        hwc_layer_t* layer = &list->hwLayers[index];
+        hwc_layer_1_t* layer = &list->hwLayers[index];
 
         int layer_prop = 0;
         get_layer_info(layer, layer_prop);
@@ -499,7 +497,7 @@ void MDPComp::reset_layer_mdp_info(layer_mdp_info* layer_info, int count) {
     }
 }
 
-bool MDPComp::alloc_layer_pipes(hwc_layer_list_t* list,
+bool MDPComp::alloc_layer_pipes(hwc_display_contents_1_t* list,
                         layer_mdp_info* layer_info, frame_info& current_frame) {
 
     int layer_count = list->numHwLayers;
@@ -513,7 +511,7 @@ bool MDPComp::alloc_layer_pipes(hwc_layer_list_t* list,
                             layer_count, mdp_count, fallback_count);
 
     for(int index = 0 ; index < layer_count ; index++ ) {
-        hwc_layer_t* layer = &list->hwLayers[index];
+        hwc_layer_1_t* layer = &list->hwLayers[index];
 
         if(layer_info[index].can_use_mdp) {
              pipe_layer_pair& info = current_frame.pipe_layer[frame_pipe_count];
@@ -541,7 +539,7 @@ bool MDPComp::alloc_layer_pipes(hwc_layer_list_t* list,
 }
 
 //returns array of layers and their allocated pipes
-bool MDPComp::parse_and_allocate(hwc_context_t* ctx, hwc_layer_list_t* list,
+bool MDPComp::parse_and_allocate(hwc_context_t* ctx, hwc_display_contents_1_t* list,
                                                   frame_info& current_frame ) {
 
     int layer_count = list->numHwLayers;
@@ -607,7 +605,7 @@ int MDPComp::configure_var_pipe(hwc_context_t* ctx) {
 }
 #endif
 
-bool MDPComp::setup(hwc_context_t* ctx, hwc_layer_list_t* list) {
+bool MDPComp::setup(hwc_context_t* ctx, hwc_display_contents_1_t* list) {
     int nPipeIndex, vsync_wait, isFG;
     int numHwLayers = list->numHwLayers;
 
@@ -655,7 +653,7 @@ bool MDPComp::setup(hwc_context_t* ctx, hwc_layer_list_t* list) {
 
     for (int index = 0 ; index < current_frame.count; index++) {
         int layer_index = current_frame.pipe_layer[index].layer_index;
-        hwc_layer_t* layer = &list->hwLayers[layer_index];
+        hwc_layer_1_t* layer = &list->hwLayers[layer_index];
         mdp_pipe_info& cur_pipe = current_frame.pipe_layer[index].pipe_index;
 
         if( prepare(ctx, layer, cur_pipe) != 0 ) {
@@ -670,7 +668,7 @@ bool MDPComp::setup(hwc_context_t* ctx, hwc_layer_list_t* list) {
     return true;
 }
 
-void MDPComp::unsetMDPCompLayerFlags(hwc_context_t* ctx, hwc_layer_list_t* list)
+void MDPComp::unsetMDPCompLayerFlags(hwc_context_t* ctx, hwc_display_contents_1_t* list)
 {
     if (!list)
         return;
@@ -683,7 +681,7 @@ void MDPComp::unsetMDPCompLayerFlags(hwc_context_t* ctx, hwc_layer_list_t* list)
     }
 }
 
-int MDPComp::draw(hwc_context_t *ctx, hwc_layer_list_t* list) {
+int MDPComp::draw(hwc_context_t *ctx, hwc_display_contents_1_t* list) {
 
     if(!isEnabled()) {
         ALOGD_IF(isDebug(),"%s: MDP Comp. not enabled",__FUNCTION__);
@@ -699,7 +697,7 @@ int MDPComp::draw(hwc_context_t *ctx, hwc_layer_list_t* list) {
 
     for(unsigned int i = 0; i < list->numHwLayers; i++ )
     {
-        hwc_layer_t *layer = &list->hwLayers[i];
+        hwc_layer_1_t *layer = &list->hwLayers[i];
 
         if(!(layer->flags & HWC_MDPCOMP)) {
             ALOGD_IF(isDebug(), "%s: Layer Not flagged for MDP comp",
@@ -814,7 +812,7 @@ bool MDPComp::init(hwc_context_t *dev) {
     return true;
 }
 
-bool MDPComp::configure(hwc_composer_device_t *dev,  hwc_layer_list_t* list) {
+bool MDPComp::configure(hwc_composer_device_1_t *dev,  hwc_display_contents_1_t* list) {
 
     if(!isEnabled()) {
         ALOGD_IF(isDebug(),"%s: MDP Comp. not enabled.", __FUNCTION__);

@@ -88,14 +88,9 @@ void ExternalDisplay::setActionSafeDimension(int w, int h) {
 
 void ExternalDisplay::triggerRefresh() {
     hwc_context_t* ctx = mHwcContext;
-    hwc_procs* proc = (hwc_procs*)ctx->device.reserved_proc[0];
-    if(!proc) {
-        ALOGE("%s: HWC proc not registered", __FUNCTION__);
-    } else {
-        /* Trigger redraw */
-        ALOGD_IF(DEBUG, "%s: Invalidate !!", __FUNCTION__);
-        proc->invalidate(proc);
-    }
+/* Trigger redraw */
+    ALOGD_IF(DEBUG, "%s: Invalidate !!", __FUNCTION__);
+    ctx->proc->invalidate(ctx->proc);
 }
 
 int ExternalDisplay::getModeCount() const {

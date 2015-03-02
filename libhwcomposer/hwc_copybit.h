@@ -34,28 +34,28 @@ namespace qhwc {
 class CopyBit {
 public:
     //Sets up members and prepares copybit if conditions are met
-    static bool prepare(hwc_context_t *ctx, hwc_layer_list_t *list);
+    static bool prepare(hwc_context_t *ctx, hwc_display_contents_1_t *list);
     //Draws layer if the layer is set for copybit in prepare
-    static bool draw(hwc_context_t *ctx, hwc_layer_list_t *list, EGLDisplay dpy,
+    static bool draw(hwc_context_t *ctx, hwc_display_contents_1_t *list, EGLDisplay dpy,
                                                                 EGLSurface sur);
     //Receives data from hwc
     static void setStats(int skipCount);
 
     static void updateEglHandles(void*);
-    static int  drawLayerUsingCopybit(hwc_context_t *dev, hwc_layer_t *layer,
+    static int  drawLayerUsingCopybit(hwc_context_t *dev, hwc_layer_1_t *layer,
                                           EGLDisplay dpy, EGLSurface surface,
                                        android_native_buffer_t *renderBuffer);
     static bool canUseCopybitForYUV (hwc_context_t *ctx);
     static bool canUseCopybitForRGB (hwc_context_t *ctx,
-                                     hwc_layer_list_t *list);
+                                     hwc_display_contents_1_t *list);
     static bool validateParams (hwc_context_t *ctx,
-                                const hwc_layer_list_t *list);
-    static bool canUseContiguousMemory(const hwc_layer_list_t* list);
+                                const hwc_display_contents_1_t *list);
+    static bool canUseContiguousMemory(const hwc_display_contents_1_t* list);
     static void closeEglLib();
     static void openEglLibAndGethandle();
 private:
     //Marks layer flags if this feature is used
-    static void markFlags(hwc_layer_t *layer);
+    static void markFlags(hwc_layer_1_t *layer);
     //Flags on animation
     static bool sIsSkipLayerPresent;
     //Flags if this feature is on.
@@ -63,9 +63,9 @@ private:
     // flag that indicates whether CopyBit is enabled or not
     static bool sCopyBitDraw;
 
-    static  unsigned int getRGBRenderingArea (const hwc_layer_list_t *list);
+    static  unsigned int getRGBRenderingArea (const hwc_display_contents_1_t *list);
 
-    static void getLayerResolution(const hwc_layer_t* layer,
+    static void getLayerResolution(const hwc_layer_1_t* layer,
                                    unsigned int &width, unsigned int& height);
 };
 

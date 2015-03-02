@@ -34,7 +34,7 @@ int VideoPIP::sPIPLayerIndex = -1;
 bool VideoPIP::sIsModeOn = false;
 
 //Cache stats, figure out the state, config overlay
-bool VideoPIP::prepare(hwc_context_t *ctx, hwc_layer_list_t *list) {
+bool VideoPIP::prepare(hwc_context_t *ctx, hwc_display_contents_1_t *list) {
     sIsModeOn = false;
     if(!ctx->mMDP.hasOverlay) {
        ALOGD_IF(VIDEOPIP_DEBUG,"%s, this hw doesnt support overlay", __FUNCTION__);
@@ -46,8 +46,8 @@ bool VideoPIP::prepare(hwc_context_t *ctx, hwc_layer_list_t *list) {
     chooseState(ctx);
     //if the state chosen above is CLOSED, skip this block.
     if(sState != ovutils::OV_CLOSED) {
-        hwc_layer_t *yuvLayer = &list->hwLayers[sYuvLayerIndex];
-        hwc_layer_t *pipLayer = NULL;
+        hwc_layer_1_t *yuvLayer = &list->hwLayers[sYuvLayerIndex];
+        hwc_layer_1_t *pipLayer = NULL;
 
         if(sPIPLayerIndex != -1) {
            pipLayer = &list->hwLayers[sPIPLayerIndex];
@@ -88,7 +88,7 @@ void VideoPIP::chooseState(hwc_context_t *ctx) {
             ovutils::getStateString(sState));
 }
 
-void VideoPIP::markFlags(hwc_layer_t *layer) {
+void VideoPIP::markFlags(hwc_layer_1_t *layer) {
     switch(sState) {
         case ovutils::OV_2D_PIP_VIDEO_ON_PANEL:
             layer->compositionType = HWC_OVERLAY;
@@ -99,7 +99,7 @@ void VideoPIP::markFlags(hwc_layer_t *layer) {
 }
 
 /* Helpers */
-bool configPrimaryVideo(hwc_context_t *ctx, hwc_layer_t *layer) {
+bool configPrimaryVideo(hwc_context_t *ctx, hwc_layer_1_t *layer) {
     overlay::Overlay& ov = *(ctx->mOverlay);
     private_handle_t *hnd = (private_handle_t *)layer->handle;
     ovutils::Whf info(hnd->width, hnd->height, hnd->format, hnd->size);
@@ -178,7 +178,7 @@ bool configPrimaryVideo(hwc_context_t *ctx, hwc_layer_t *layer) {
 
 
 // Configure the second video in pip scenario
-bool configPIPVideo(hwc_context_t *ctx, hwc_layer_t *layer) {
+bool configPIPVideo(hwc_context_t *ctx, hwc_layer_1_t *layer) {
     overlay::Overlay& ov = *(ctx->mOverlay);
     private_handle_t *hnd = (private_handle_t *)layer->handle;
     ovutils::Whf info(hnd->width, hnd->height, hnd->format, hnd->size);
@@ -256,8 +256,8 @@ bool configPIPVideo(hwc_context_t *ctx, hwc_layer_t *layer) {
     return true;
 }
 
-bool VideoPIP::configure(hwc_context_t *ctx, hwc_layer_t *yuvLayer,
-        hwc_layer_t *pipLayer) {
+bool VideoPIP::configure(hwc_context_t *ctx, hwc_layer_1_t *yuvLayer,
+        hwc_layer_1_t *pipLayer) {
 
     bool ret = true;
     if (LIKELY(ctx->mOverlay)) {
@@ -281,7 +281,7 @@ bool VideoPIP::configure(hwc_context_t *ctx, hwc_layer_t *yuvLayer,
     return ret;
 }
 
-bool VideoPIP::draw(hwc_context_t *ctx, hwc_layer_list_t *list)
+bool VideoPIP::draw(hwc_context_t *ctx, hwc_display_contents_1_t *list)
 {
     if(!sIsModeOn || sYuvLayerIndex == -1 || sPIPLayerIndex == -1) {
         return true;

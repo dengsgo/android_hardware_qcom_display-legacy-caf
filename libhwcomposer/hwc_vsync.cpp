@@ -69,8 +69,6 @@ static void *vsync_loop(void *param)
        e.g. VSYNC=41800875994
     */
 
-    hwc_procs* proc = (hwc_procs*)ctx->device.reserved_proc[0];
-
     do {
         pthread_mutex_lock(&ctx->vstate.lock);
         if(ctx->vstate.enable == false) {
@@ -121,7 +119,7 @@ static void *vsync_loop(void *param)
       // send timestamp to HAL
       ALOGD_IF (VSYNC_DEBUG, "%s: timestamp %llu sent to HWC for %s",
             __FUNCTION__, cur_timestamp, (fb1_vsync) ? "fb1" : "fb0");
-      proc->vsync(proc, 0, cur_timestamp);
+      ctx->proc->vsync(ctx->proc, 0, cur_timestamp);
 
       // close open fds
       close (fd_timestamp);
@@ -132,7 +130,7 @@ static void *vsync_loop(void *param)
     usleep(16666);
     e = 1;
     ioctl(m->framebuffer->fd, MSMFB_OVERLAY_VSYNC_CTRL, &e);
-    proc->vsync(proc, 0, systemTime());
+    ctx->proc->vsync(ctx->proc, 0, systemTime());
 #endif
       // repeat, whatever, you just did
     } while (true);

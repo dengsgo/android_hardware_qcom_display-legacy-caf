@@ -40,7 +40,7 @@ private:
   static bool sGPUlayerpresent;
 
 public:
-  static void checkforGPULayer(const hwc_layer_list_t* list);
+  static void checkforGPULayer(const hwc_display_contents_1_t* list);
   static bool isUpdatingFB(int compositionType);
   static int qcomuiClearRegion(Region region, EGLDisplay dpy);
 };

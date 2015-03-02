@@ -52,11 +52,10 @@ static void handle_uevent(hwc_context_t* ctx, const char* udata, int len)
         strncpy(ctx->mHDMIEvent,str,strlen(str));
         ctx->hdmi_pending = true;
         //Invalidate
-        hwc_procs* proc = (hwc_procs*)ctx->device.reserved_proc[0];
-        if(!proc) {
+        if(!ctx->proc) {
             ALOGE("%s: HWC proc not registered", __FUNCTION__);
         } else {
-            proc->invalidate(proc);
+            ctx->proc->invalidate(ctx->proc);
         }
     } else if(!(strncmp(str,"offline@",strlen("offline@")))) {
         ctx->hdmi_pending = false;

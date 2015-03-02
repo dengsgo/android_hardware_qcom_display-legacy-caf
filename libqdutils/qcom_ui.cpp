@@ -597,7 +597,7 @@ inline void getHalPixelFormatStr(int format, char pixelformatstr[])
 }
 
 void dumpLayer(int moduleCompositionType, int listFlags, size_t layerIndex,
-               hwc_layer_t hwLayers[])
+               hwc_layer_1_t hwLayers[])
 {
     char dumplogstr_png[128] = "";
     char dumplogstr_raw[128] = "";

@@ -18,12 +18,14 @@
 #ifndef HWC_UTILS_H
 #define HWC_UTILS_H
 
+#define HWC_REMOVE_DEPRECATED_VERSIONS 1
 #include <hardware/hwcomposer.h>
 #include <gralloc_priv.h>
 
 #define ALIGN_TO(x, align)     (((x) + ((align)-1)) & ~((align)-1))
 #define LIKELY( exp )       (__builtin_expect( (exp) != 0, true  ))
 #define UNLIKELY( exp )     (__builtin_expect( (exp) != 0, false ))
+#define MAX_NUM_DISPLAYS 4 //Yes, this is ambitious
 
 //Fwrd decls
 struct hwc_context_t;
@@ -70,8 +72,8 @@ enum {
 
 // -----------------------------------------------------------------------------
 // Utility functions - implemented in hwc_utils.cpp
-void dumpLayer(hwc_layer_t const* l);
-void getLayerStats(hwc_context_t *ctx, const hwc_layer_list_t *list);
+void dumpLayer(hwc_layer_1_t const* l);
+void getLayerStats(hwc_context_t *ctx, const hwc_display_contents_1_t *list);
 void initContext(hwc_context_t *ctx);
 void closeContext(hwc_context_t *ctx);
 //Crops source buffer against destination and FB boundaries
@@ -85,7 +87,7 @@ void wait4fbPost(hwc_context_t* ctx);
 void wait4Pan(hwc_context_t* ctx);
 
 // Inline utility functions
-static inline bool isSkipLayer(const hwc_layer_t* l) {
+static inline bool isSkipLayer(const hwc_layer_1_t* l) {
     return (UNLIKELY(l && (l->flags & HWC_SKIP_LAYER)));
 }
 
@@ -120,7 +122,7 @@ void init_uevent_thread(hwc_context_t* ctx);
 // Initialize vsync thread
 void init_vsync_thread(hwc_context_t* ctx);
 
-inline void getLayerResolution(const hwc_layer_t* layer,
+inline void getLayerResolution(const hwc_layer_1_t* layer,
                                          int& width, int& height)
 {
     hwc_rect_t displayFrame  = layer->displayFrame;
@@ -139,11 +141,13 @@ struct vsync_state {
 // HWC context
 // This structure contains overall state
 struct hwc_context_t {
-    hwc_composer_device_t device;
+    hwc_composer_device_1_t device;
+    const hwc_procs_t* proc;
     int numHwLayers;
     int overlayInUse;
     int swapInterval;
     double dynThreshold;
+    hwc_display_t dpys[MAX_NUM_DISPLAYS];
 
     //Framebuffer device
     framebuffer_device_t *mFbDev;
